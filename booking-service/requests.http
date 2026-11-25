@@ -1,0 +1,97 @@
+### FleetDesk Booking API - VS Code REST Client
+### Start everything first:  npm run demo:all   (Fleet on 3001, Booking on 3002)
+### Click "Send Request" above each block, top to bottom.
+
+@fleet = http://localhost:3001
+@api = http://localhost:3002
+@password = Demo-Pass-2026
+@from = 2026-12-15T09:00:00Z
+@to = 2026-12-15T13:00:00Z
+
+### 1. Health check (no login) -> 200
+GET {{api}}/api/health
+
+### 2. Log in through the Fleet API (shared login)
+# @name adminLogin
+POST {{fleet}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "admin@fleetdesk.test", "password": "{{password}}" }
+
+### 3.
+# @name saraLogin
+POST {{fleet}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "sara@fleetdesk.test", "password": "{{password}}" }
+
+@admin = {{adminLogin.response.body.token}}
+@sara = {{saraLogin.response.body.token}}
+
+### 4. No token -> 401
+GET {{api}}/api/bookings
+
+### 5. Free cars for 2 passengers (Booking asks Fleet) -> 200
+# @name search
+GET {{api}}/api/bookings/availability?from={{from}}&to={{to}}&seats=2
+Authorization: Bearer {{sara}}
+
+@carId = {{search.response.body.cars[0].id}}
+
+### 6. Trip estimate (needs ORS_API_KEY, otherwise 503)
+GET {{api}}/api/bookings/estimate?destination=Smart Village, Giza
+Authorization: Bearer {{sara}}
+
+### 7. Request a car -> 201 Pending (try adding "status": "Approved": it is ignored)
+# @name created
+POST {{api}}/api/bookings
+Authorization: Bearer {{sara}}
+Content-Type: application/json
+
+{ "vehicleId": "{{carId}}", "startAt": "{{from}}", "endAt": "{{to}}",
+  "purpose": "Client meeting at Smart Village", "destination": "Smart Village, Giza", "passengers": 2 }
+
+@bookingId = {{created.response.body.id}}
+
+### 8. Invalid: end before start -> 400
+POST {{api}}/api/bookings
+Authorization: Bearer {{sara}}
+Content-Type: application/json
+
+{ "vehicleId": "{{carId}}", "startAt": "{{to}}", "endAt": "{{from}}", "purpose": "Wrong dates", "destination": "Cairo" }
+
+### 9. Employee tries to approve -> 403
+PATCH {{api}}/api/bookings/{{bookingId}}/status
+Authorization: Bearer {{sara}}
+Content-Type: application/json
+
+{ "status": "Approved" }
+
+### 10. Admin approves -> 200 Approved
+PATCH {{api}}/api/bookings/{{bookingId}}/status
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "status": "Approved" }
+
+### 11. Conflicts (what Fleet calls) -> { "conflict": true }
+GET {{api}}/api/bookings/conflicts?vehicleId={{carId}}&from={{from}}&to={{to}}
+Authorization: Bearer {{admin}}
+
+### 12. Fleet schedules maintenance in that slot -> 409 BOOKING_CLASH (Fleet asked Booking)
+POST {{fleet}}/api/vehicles/{{carId}}/maintenance
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "type": "Service", "startDate": "{{from}}", "endDate": "{{to}}" }
+
+### 13. Sara's own bookings
+GET {{api}}/api/bookings
+Authorization: Bearer {{sara}}
+
+### 14. Sara cancels -> 200 Cancelled
+PATCH {{api}}/api/bookings/{{bookingId}}/status
+Authorization: Bearer {{sara}}
+Content-Type: application/json
+
+{ "status": "Cancelled" }

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FleetDesk - Bookings</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/bookings.css">
+</head>
+<body>
+  <header class="topbar">
+    <strong>FleetDesk</strong>
+    <nav>
+      <a href="vehicles.html">Cars</a>
+      <a href="bookings.html" class="active">Bookings</a>
+      <a href="maintenance.html" class="admin-only" hidden>Maintenance</a>
+      <a href="reports.html">Car problems</a>
+    </nav>
+    <span id="who" class="muted"></span>
+    <button id="logout" class="link-button">Log out</button>
+  </header>
+
+  <main>
+    <h1>Book a company car</h1>
+    <p id="page-message" class="message" hidden></p>
+
+    <section class="card admin-only" id="queue-card" hidden>
+      <h2>Waiting for approval <span id="queue-count" class="count">0</span></h2>
+      <p class="muted small">Oldest request first. You cannot approve your own booking. A reason is needed to reject.</p>
+      <table>
+        <thead><tr><th>Requested by</th><th>Car</th><th>When</th><th>Trip</th><th>Estimate</th><th>Decision</th></tr></thead>
+        <tbody id="queue-rows"></tbody>
+      </table>
+      <p id="queue-empty" class="muted" hidden>Nothing is waiting.</p>
+    </section>
+
+    <section class="card admin-only" id="monitor-card" hidden>
+      <div class="title-row">
+        <h2>Monitoring</h2>
+        <button type="button" id="refresh-monitor" class="small secondary">Refresh</button>
+      </div>
+      <div id="metric-cards" class="metric-cards"></div>
+      <div class="monitor-grid">
+        <div>
+          <h3>Alert rules <span class="muted small">(last 15 minutes)</span></h3>
+          <div id="alert-rules" class="alert-rules"></div>
+          <p id="alert-channels" class="muted small"></p>
+          <ul id="recent-alerts" class="recent-alerts"></ul>
+        </div>
+        <div>
+          <h3>Recent security events <span class="muted small">(24 hours)</span></h3>
+          <table>
+            <thead><tr><th>Time</th><th>Event</th><th>Who</th><th>Request</th></tr></thead>
+            <tbody id="security-rows"></tbody>
+          </table>
+          <p id="security-empty" class="muted small" hidden>No security events in the last 24 hours.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <ol class="steps" aria-label="Booking steps">
+        <li class="step is-active" id="step-1"><span>1</span>Dates</li>
+        <li class="step" id="step-2"><span>2</span>Car</li>
+        <li class="step" id="step-3"><span>3</span>Trip details</li>
+      </ol>
+      <h2>When do you need a car?</h2>
+      <form id="search-form" class="grid-form" novalidate>
+        <label>From <input id="from" type="datetime-local" required></label>
+        <label>To <input id="to" type="datetime-local" required></label>
+        <label>Passengers <input id="seats" type="number" min="1" max="15" value="1" required></label>
+        <div class="form-actions"><button type="submit" id="search-button">Find free cars</button></div>
+      </form>
+      <p class="muted small">Up to 14 days per booking, at most 90 days ahead.</p>
+      <div id="car-results" class="car-results"></div>
+    </section>
+
+    <section class="card" id="details-card" hidden>
+      <h2>Trip details</h2>
+      <div id="chosen-car" class="chosen-car"></div>
+      <form id="booking-form" class="grid-form" novalidate>
+        <label class="wide">Purpose of the trip
+          <input id="purpose" minlength="5" maxlength="200" required placeholder="e.g. Client meeting in Smart Village">
+        </label>
+        <label class="wide">Destination
+          <span class="inline-field">
+            <input id="destination" minlength="3" maxlength="150" required placeholder="e.g. Smart Village, Giza">
+            <button type="button" id="estimate-button" class="secondary">Estimate trip</button>
+          </span>
+        </label>
+        <p id="estimate-result" class="muted small wide" aria-live="polite"></p>
+        <div class="form-actions wide">
+          <button type="submit" id="request-button">Send booking request</button>
+          <button type="button" id="change-car" class="secondary">Choose another car</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" id="edit-card" hidden>
+      <h2>Edit booking <span id="edit-plate"></span></h2>
+      <p class="muted small">You can change a booking while it is waiting for approval. New dates are checked again with the Fleet service.</p>
+      <form id="edit-form" class="grid-form" novalidate>
+        <label>From <input id="edit-from" type="datetime-local" required></label>
+        <label>To <input id="edit-to" type="datetime-local" required></label>
+        <label>Passengers <input id="edit-seats" type="number" min="1" max="15" required></label>
+        <label class="wide">Purpose of the trip <input id="edit-purpose" minlength="5" maxlength="200" required></label>
+        <label class="wide">Destination <input id="edit-destination" minlength="3" maxlength="150" required></label>
+        <div class="form-actions wide">
+          <button type="submit" id="edit-save">Save changes</button>
+          <button type="button" id="edit-cancel" class="secondary">Stop editing</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2 id="list-title">My bookings</h2>
+      <div class="filters">
+        <label>Status
+          <select id="filter-status">
+            <option value="">All</option><option>Pending</option><option>Approved</option>
+            <option>Rejected</option><option>Cancelled</option><option>Completed</option>
+          </select>
+        </label>
+        <label class="admin-only check" hidden><span><input type="checkbox" id="filter-mine"> Only mine</span></label>
+      </div>
+      <table>
+        <thead><tr id="list-head"><th>Car</th><th>When</th><th>Trip</th><th>Estimate</th><th>Status</th><th>Note</th><th>Actions</th></tr></thead>
+        <tbody id="booking-rows"></tbody>
+      </table>
+      <p id="empty" class="muted" hidden>No bookings yet.</p>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/bookings.js"></script>
+</body>
+</html>

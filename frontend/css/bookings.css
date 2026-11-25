@@ -1,0 +1,107 @@
+/* Extra styles for the Bookings page only (Youssef). Uses the variables from style.css. */
+
+.badge.pending { color: var(--warn); }
+.badge.approved { color: var(--ok-ink); }
+.badge.rejected { color: var(--danger); }
+
+.count { display: inline-block; min-width: 1.6rem; padding: 0 0.45rem; margin-left: 0.35rem; border-radius: 999px;
+         background: var(--bg); border: 1px solid var(--line); font-size: 0.85rem; text-align: center; color: var(--muted); }
+.count.has-items { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+/* Step indicator: Dates -> Car -> Trip details */
+.steps { list-style: none; display: flex; gap: 0.5rem; padding: 0; margin: 0 0 1rem; flex-wrap: wrap; }
+.step { display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; font-weight: 600; color: var(--muted);
+        padding: 0.25rem 0.75rem 0.25rem 0.3rem; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.step span { width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-items: center;
+             background: var(--line); color: var(--ink); font-size: 0.75rem; }
+.step.is-active { color: var(--brand); border-color: #c4d4e6; background: #eef4fa; }
+.step.is-active span { background: var(--brand); color: #fff; }
+.step.is-done { color: var(--ok-ink); }
+.step.is-done span { background: var(--ok-ink); color: #fff; }
+
+/* Free cars as cards with a picture */
+.car-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.85rem; margin-top: 0.75rem; }
+.results-note { grid-column: 1 / -1; margin: 0; }
+.car-card { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card);
+            transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
+.car-card:hover { border-color: #b7c5d6; box-shadow: 0 4px 14px rgba(29, 39, 51, 0.08); transform: translateY(-1px); }
+.car-card.selected { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(31, 92, 153, 0.18); }
+.car-visual { background: linear-gradient(180deg, #eef3f9, #f8fafc); padding: 0.9rem 1rem 0.3rem; color: var(--brand); }
+.car-visual svg { display: block; width: 100%; max-width: 150px; height: 70px; margin: 0 auto; }
+.car-body { padding: 0.75rem 0.9rem 0.9rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.car-body h3 { margin: 0; font-size: 1rem; }
+.car-body button { margin-top: 0.15rem; }
+.car-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.tag { font-size: 0.75rem; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 0.05rem 0.55rem; }
+
+/* Egyptian-style number plate: blue band on top, the number below */
+.plate { display: inline-grid; align-self: flex-start; border: 1.5px solid #1c2c4c; border-radius: 6px; overflow: hidden;
+         width: max-content; background: #fff; }
+.plate-band { background: #2f6ec7; color: #fff; font-size: 0.55rem; font-weight: 700; letter-spacing: 0.12em;
+              padding: 0.05rem 0.4rem; display: flex; justify-content: space-between; gap: 0.6rem; }
+.plate-number { font-family: Consolas, "Courier New", monospace; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.12em;
+                padding: 0.1rem 0.5rem; text-align: center; color: #111; }
+.small-plate .plate-band { font-size: 0.45rem; padding: 0 0.3rem; }
+.small-plate .plate-number { font-size: 0.75rem; padding: 0.05rem 0.4rem; }
+td.car-cell { min-width: 8.5rem; }
+.car-label { display: block; margin-top: 0.3rem; font-size: 0.85rem; color: var(--muted); }
+
+/* The chosen car at the top of Trip details */
+.chosen-car { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin: 0 0 0.9rem;
+              padding: 0.7rem 0.9rem; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+.chosen-car svg { width: 4.4rem; height: 2.1rem; color: var(--brand); flex: none; }
+.chosen-text { display: grid; gap: 0.15rem; flex: 1; min-width: 12rem; }
+
+.inline-field { display: flex; gap: 0.5rem; }
+.inline-field input { flex: 1; min-width: 0; }
+.grid-form p.wide { margin: 0; grid-column: 1 / -1; }
+.grid-form .form-actions.wide { grid-column: 1 / -1; }
+label.check { justify-content: flex-end; }
+label.check span { display: flex; gap: 0.4rem; align-items: center; color: var(--ink); }
+
+.when { white-space: nowrap; }
+.trip-purpose { display: block; }
+.trip-destination { display: block; color: var(--muted); font-size: 0.85rem; }
+td.decision { min-width: 15rem; }
+td.decision input { width: 100%; margin-bottom: 0.35rem; }
+td.decision .buttons { display: flex; gap: 0.35rem; }
+input[type="datetime-local"] { min-width: 0; width: 100%; }
+
+@media (max-width: 700px) {
+  table { display: block; overflow-x: auto; }
+  .inline-field { flex-direction: column; }
+}
+
+.row-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.row-actions input { flex-basis: 100%; }
+
+/* Edit, history (audit trail) */
+.history-row td { background: var(--bg); }
+.history-cell strong { display: block; margin-bottom: 0.4rem; font-size: 0.9rem; }
+.timeline { list-style: none; margin: 0; padding: 0 0 0 0.9rem; border-left: 2px solid var(--line); display: grid; gap: 0.45rem; }
+.timeline-item { position: relative; display: grid; gap: 0.05rem; font-size: 0.9rem; }
+.timeline-item::before { content: ""; position: absolute; left: -1.25rem; top: 0.3rem; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--muted); }
+.timeline-item.created::before, .timeline-item.updated::before { background: var(--brand); }
+.timeline-item.approved::before, .timeline-item.completed::before { background: var(--ok-ink); }
+.timeline-item.rejected::before, .timeline-item.cancelled::before { background: var(--danger); }
+#edit-plate .plate { vertical-align: middle; margin-left: 0.4rem; }
+
+/* Monitoring panel */
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.title-row h2 { margin: 0; }
+.metric-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem; margin: 0.9rem 0 1.1rem; }
+.metric { border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.75rem; display: grid; gap: 0.15rem; background: var(--card); }
+.metric-value { font-size: 1.5rem; font-weight: 700; color: var(--ink); }
+.metric-label { font-size: 0.8rem; color: var(--muted); }
+.metric-warn { border-color: #f0c9a0; background: #fff8f0; }
+.metric-warn .metric-value { color: var(--warn); }
+.monitor-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 1.25rem; }
+.monitor-grid h3 { font-size: 0.95rem; margin: 0 0 0.5rem; }
+.alert-rules { display: grid; gap: 0.6rem; margin-bottom: 0.6rem; }
+.alert-rule { display: grid; gap: 0.25rem; font-size: 0.88rem; }
+.alert-rule progress { width: 100%; height: 0.55rem; accent-color: var(--brand); }
+.alert-rule.firing span { color: var(--danger); font-weight: 600; }
+.alert-rule.firing progress { accent-color: var(--danger); }
+.recent-alerts { margin: 0; padding-left: 1.1rem; font-size: 0.85rem; color: var(--muted); }
+.mono { font-family: ui-monospace, Consolas, monospace; word-break: break-all; }
+@media (max-width: 800px) { .monitor-grid { grid-template-columns: minmax(0, 1fr); } }
