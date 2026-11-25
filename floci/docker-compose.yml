@@ -1,0 +1,48 @@
+# Floci for the FleetDesk copy (local testing only).
+#   docker compose up -d      start          docker compose down      stop (everything deployed is wiped)
+# Stop any other Floci (for example the Lab 7 one) first: only one can use port 4566.
+name: fleetdesk-floci
+
+services:
+  floci:
+    image: floci/floci:latest
+    container_name: floci
+    ports:
+      - "4566:4566"            # AWS APIs, API Gateway, S3
+      - "7001-7099:7001-7099"  # RDS Postgres proxy ports
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # Lambda and RDS run as Docker containers
+    environment:
+      FLOCI_HOSTNAME: floci                           # Lambda containers reach Floci at http://floci:4566
+      FLOCI_SERVICES_DOCKER_NETWORK: fleetdesk-floci  # ...because they join this network
+
+  # Postgres website, like the Neon console (tables + SQL editor): http://localhost:8081
+  # Log in with: System PostgreSQL, Server floci:7001 (Fleet),
+  # Username fleetdesk, Password = "masterPassword" in .state.json, Database postgres.
+  db-ui:
+    image: adminer:latest
+    container_name: fleetdesk-db-ui
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: floci:7001
+    depends_on:
+      - floci
+
+  # DynamoDB website (tables and items): http://localhost:8001   (no login)
+  dynamodb-ui:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: fleetdesk-dynamodb-ui
+    ports:
+      - "8001:8001"
+    environment:
+      DYNAMO_ENDPOINT: http://floci:4566
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+    depends_on:
+      - floci
+
+networks:
+  default:
+    name: fleetdesk-floci

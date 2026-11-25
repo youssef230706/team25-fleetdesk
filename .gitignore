@@ -1,0 +1,10 @@
+# Never commit secrets or generated files
+.env
+.env.*
+!.env.example
+node_modules/
+coverage/
+floci/build/
+floci/.state.json
+*.log
+.DS_Store

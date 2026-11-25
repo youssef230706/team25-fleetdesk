@@ -1,0 +1,19 @@
+# Who must review changes to each part (GitHub requests the review automatically).
+# Replace ZIAD-GITHUB-USERNAME with Ziad's GitHub username.
+*                      @youssef230706 @kareemhaitham098 @ZIAD-GITHUB-USERNAME
+/fleet-service/        @kareemhaitham098
+/docs/fleet-api.md     @kareemhaitham098
+/booking-service/      @youssef230706
+/docs/booking-api.md   @youssef230706
+/trip-service/         @ZIAD-GITHUB-USERNAME
+/docs/trip-api.md      @ZIAD-GITHUB-USERNAME
+/floci/                @youssef230706
+/frontend/js/api.js    @kareemhaitham098
+/frontend/js/config.js @kareemhaitham098
+/frontend/css/style.css @kareemhaitham098
+/frontend/bookings.html @youssef230706
+/frontend/js/bookings.js @youssef230706
+/frontend/css/bookings.css @youssef230706
+/frontend/trips.html   @ZIAD-GITHUB-USERNAME
+/frontend/js/trips.js  @ZIAD-GITHUB-USERNAME
+/.github/              @youssef230706 @kareemhaitham098 @ZIAD-GITHUB-USERNAME

@@ -1,0 +1,42 @@
+# Runs on every pull request and on main: the tests of each service that exists, plus a secret scan.
+name: tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [fleet-service, booking-service, trip-service]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tests (${{ matrix.service }})
+        run: |
+          if [ ! -f "${{ matrix.service }}/package.json" ]; then
+            echo "${{ matrix.service }} is not in the repository yet, skipping."
+            exit 0
+          fi
+          cd ${{ matrix.service }}
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npm test
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Secret exposure review
+        run: node booking-service/scripts/secret-scan.js .
